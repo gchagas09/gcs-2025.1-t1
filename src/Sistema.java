@@ -30,15 +30,46 @@ public class Sistema {
         // Criar departamentos (não instanciando, mas acessando os valores do enum)
         Departamento financeiro = Departamento.FINANCEIRO;
         Departamento rh = Departamento.RECURSOS_HUMANOS;
+        Departamento mkt = Departamento.MARKETING;
+        Departamento vendas = Departamento.VENDAS;
+        Departamento dir = Departamento.DIRETORIA;
+        Departamento ti = Departamento.TI;
+        Departamento op = Departamento.OPERACOES;
         
         // Criar usuarios
         Funcionario funcionario1 = new Funcionario(1, "Carlos Silva", rh);
         Funcionario funcionario2 = new Funcionario(2, "Ana Pereira", financeiro);
-        Administrador administrador = new Administrador(3, "Jose Souza");
+        Funcionario funcionario3 = new Funcionario(3, "Pedro Silva", op);
+        Funcionario funcionario4 = new Funcionario(4, "Ana Santos", mkt);
+        Funcionario funcionario5 = new Funcionario(5, "Carlos Sales", vendas);
+        Funcionario funcionario6 = new Funcionario(6, "Joao Diniz", dir);
+        Funcionario funcionario7 = new Funcionario(7, "Joao Sales", vendas);
+        Funcionario funcionario8 = new Funcionario(8, "Artur Diniz", dir);
+        Funcionario funcionario9 = new Funcionario(9, "Luiza Ferreira", mkt);
+        Funcionario funcionario10 = new Funcionario(10, "Antonio Sasso", ti);
+        Funcionario funcionario11 = new Funcionario(11, "Fabio Rossi", ti);
+        Funcionario funcionario12 = new Funcionario(12, "Eduarda Monteiro", op);
+        Funcionario funcionario13 = new Funcionario(13, "Felipe Junior", rh);
+        Funcionario funcionario14 = new Funcionario(14, "Lucca Carli", financeiro);
+        
+        Administrador administrador = new Administrador(15, "Jose Souza");
 
         // Adicionar usuarios a lista
         adicionarUsuario(funcionario1);
         adicionarUsuario(funcionario2);
+        adicionarUsuario(funcionario3);
+        adicionarUsuario(funcionario4);
+        adicionarUsuario(funcionario5);
+        adicionarUsuario(funcionario6);
+        adicionarUsuario(funcionario7);
+        adicionarUsuario(funcionario8);
+        adicionarUsuario(funcionario9);
+        adicionarUsuario(funcionario10);
+        adicionarUsuario(funcionario11);
+        adicionarUsuario(funcionario12);
+        adicionarUsuario(funcionario13);
+        adicionarUsuario(funcionario14);
+
         adicionarUsuario(administrador);
 
         // Criar pedidos

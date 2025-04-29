@@ -18,7 +18,8 @@ public class App {
             System.out.println("1. Adicionar Pedido");
             System.out.println("2. Listar Usuarios");
             System.out.println("3. Listar Pedidos");
-            System.out.println("4. Sair");
+            System.out.println("4. Opcoes para o administrador");
+            System.out.println("5. Sair");
             System.out.print("Escolha uma opcao: ");
             opcao = scanner.nextInt();
             scanner.nextLine();  // Limpar o buffer
@@ -34,12 +35,15 @@ public class App {
                     listarPedidos();
                     break;
                 case 4:
+                    FuncaoAdministrador();
+                    break;
+                case 5:
                     System.out.println("Saindo...");
                     break;
                 default:
                     System.out.println("Opcao invalida!");
             }
-        } while (opcao != 4);
+        } while (opcao != 5);
     }
 
     private void adicionarPedido() {
@@ -102,6 +106,34 @@ public class App {
         System.out.println("\nPedidos cadastrados:");
         for (Pedido pedido : sistema.getPedidos()) {
             System.out.println(pedido);
+        }
+    }
+    
+    private void FuncaoAdministrador(){
+        System.out.println("---MENU ADM---");
+        System.out.println("1. Avaliar pedidos.");
+        System.out.println("2. Listar pedidos por data.");
+        System.out.println("3. Buscar pedidos por funcionario.");
+        System.out.println("4. Buscar pedidos pela descrição.");
+        System.out.println("5. Sair");
+        System.out.print("Escolha uma opcao: ");
+        int valor = scanner.nextInt();
+        scanner.nextLine();
+
+        switch (valor) {
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+            case 5:
+                System.out.println("saindo...");
+                break;
+            default:
+                System.out.println("Opcao Invalida!");
         }
     }
 }
