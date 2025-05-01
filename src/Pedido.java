@@ -8,20 +8,23 @@ public class Pedido {
     private String descricaoItem;
     private double valorUnitario;
     private int quantidade;
-    private double totalItem;
     private double totalPedido;
-    private String status;
+    private StatusPedido status;
 
-    public Pedido(Funcionario funcionario, Departamento departamento, Date dataPedido, String descricaoItem, double valorUnitario, int quantidade, double totalItem) {
+    public Pedido(Funcionario funcionario,
+                  Departamento departamento,
+                  Date dataPedido,
+                  String descricaoItem,
+                  double valorUnitario,
+                  int quantidade) {
         this.funcionario = funcionario;
         this.departamento = departamento;
         this.dataPedido = dataPedido;
         this.descricaoItem = descricaoItem;
         this.valorUnitario = valorUnitario;
         this.quantidade = quantidade;
-        this.totalItem = totalItem;
-        this.totalPedido = totalItem; // Considerando que o pedido tem apenas um item por enquanto
-        this.status = "ABERTO";
+        this.totalPedido = valorUnitario * quantidade;
+        this.status = StatusPedido.ABERTO;
     }
 
     public Funcionario getFuncionario() {
@@ -44,20 +47,28 @@ public class Pedido {
         this.dataConclusao = dataConclusao;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
+    public String getDescricaoItem() {
+        return descricaoItem;
     }
 
     public double getTotal() {
         return totalPedido;
     }
 
+    public StatusPedido getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusPedido status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
-        return "Pedido [Funcionario=" + funcionario.getNome() + ", Departamento=" + departamento + ", Data Pedido=" + dataPedido + ", Status=" + status + ", Total Pedido=" + totalPedido + "]";
+        return "Pedido [Funcionario=" + funcionario.getNome() +
+               ", Departamento=" + departamento +
+               ", DataPedido=" + dataPedido +
+               ", Status=" + status +
+               ", Total=" + totalPedido + "]";
     }
 }

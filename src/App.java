@@ -1,139 +1,226 @@
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 
 public class App {
-    private Sistema sistema;
-    private Scanner scanner;
+    private Sistema sistema = new Sistema();
+    private Scanner scanner = new Scanner(System.in);
+    private Usuario usuarioAtual;
 
     public App() {
-        sistema = new Sistema();
-        scanner = new Scanner(System.in);
-        sistema.inicializar();  // Inicializa com dados pré-cadastrados
+        sistema.inicializar();
     }
 
     public void run() {
-        int opcao;
-
-        do {
-            System.out.println("\n--- MENU ---");
-            System.out.println("1. Adicionar Pedido");
-            System.out.println("2. Listar Usuarios");
-            System.out.println("3. Listar Pedidos");
-            System.out.println("4. Opcoes para o administrador");
-            System.out.println("5. Sair");
-            System.out.print("Escolha uma opcao: ");
-            opcao = scanner.nextInt();
-            scanner.nextLine();  // Limpar o buffer
-
-            switch (opcao) {
-                case 1:
-                    adicionarPedido();
-                    break;
-                case 2:
-                    listarUsuarios();
-                    break;
-                case 3:
-                    listarPedidos();
-                    break;
-                case 4:
-                    FuncaoAdministrador();
-                    break;
-                case 5:
-                    System.out.println("Saindo...");
-                    break;
-                default:
-                    System.out.println("Opcao invalida!");
-            }
-        } while (opcao != 5);
-    }
-
-    private void adicionarPedido() {
-        // Exemplo de como adicionar um pedido
-        System.out.println("Adicionando novo pedido:");
-
-        // Escolher um funcionário (usando o ID)
-        System.out.print("Digite o ID do funcionario: ");
-        int funcionarioId = scanner.nextInt();
-        scanner.nextLine();  // Limpar o buffer
-
-        Funcionario funcionario = null;
-        for (Usuario usuario : sistema.getUsuarios()) {
-            if (usuario instanceof Funcionario && usuario.getId() == funcionarioId) {
-                funcionario = (Funcionario) usuario;
+        while (true) {
+            if (!fazerLogin()) {
+                System.out.println("Saindo do sistema...");
                 break;
             }
+            if (usuarioAtual.isAdministrador()) {
+                menuAdmin();
+            } else {
+                menuFuncionario();
+            }
         }
+    }
 
-        if (funcionario == null) {
-            System.out.println("Funcionario nao encontrado.");
+    private boolean fazerLogin() {
+        System.out.println("\n--- LOGIN ---");
+        System.out.print("Digite o ID do usuario (0 sai): ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+        if (id == 0) return false;
+        for (Usuario u : sistema.getUsuarios()) {
+            if (u.getId() == id) {
+                usuarioAtual = u;
+                System.out.println("Bem-vindo, " + u.getNome());
+                return true;
+            }
+        }
+        System.out.println("Usuario nao encontrado");
+        return fazerLogin();
+    }
+
+    private void menuFuncionario() {
+        Funcionario f = (Funcionario) usuarioAtual;
+        int op;
+        do {
+            System.out.println("\n--- MENU FUNCIONARIO ---");
+            System.out.println("1. Registrar novo pedido");
+            System.out.println("2. Excluir pedido aberto");
+            System.out.println("3. Trocar usuario");
+            System.out.println("4. Sair");
+            System.out.print("Opcao: ");
+            op = scanner.nextInt();
+            scanner.nextLine();
+            switch (op) {
+                case 1: registrarPedido(f); break;
+                case 2: excluirPedido(f); break;
+                case 3: return;
+                case 4: System.exit(0);
+                default: System.out.println("Opcao invalida");
+            }
+        } while (true);
+    }
+
+    private void registrarPedido(Funcionario f) {
+        System.out.print("Descricao do item: ");
+        String desc = scanner.nextLine();
+        System.out.print("Valor unitario: ");
+        double v = scanner.nextDouble();
+        System.out.print("Quantidade: ");
+        int q = scanner.nextInt();
+        scanner.nextLine();
+        double total = v * q;
+        if (total <= f.getDepartamento().getLimite()) {
+            Pedido p = new Pedido(f, f.getDepartamento(), new Date(), desc, v, q);
+            sistema.adicionarPedido(p);
+            System.out.println("Pedido criado: " + p);
+        } else {
+            System.out.println("Excede limite de R$ " + f.getDepartamento().getLimite());
+        }
+    }
+
+    private void excluirPedido(Funcionario f) {
+        System.out.print("ID do pedido a excluir: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+        List<Pedido> abertos = new ArrayList<>();
+        for (Pedido p : sistema.getPedidos()) {
+            if (p.getStatus() == StatusPedido.ABERTO && p.getFuncionario().getId() == f.getId()) {
+                abertos.add(p);
+            }
+        }
+        for (Pedido p : abertos) {
+            if (p.hashCode() == id) {
+                sistema.getPedidos().remove(p);
+                System.out.println("Pedido excluido");
+                return;
+            }
+        }
+        System.out.println("Pedido nao encontrado ou nao eh seu");
+    }
+
+    private void menuAdmin() {
+        int op;
+        do {
+            System.out.println("\n--- MENU ADMINISTRADOR ---");
+            System.out.println("1. Listar pedidos entre datas");
+            System.out.println("2. Buscar pedidos por funcionario");
+            System.out.println("3. Buscar pedidos por descricao de item");
+            System.out.println("4. Visualizar e avaliar pedido");
+            System.out.println("5. Estatisticas gerais");
+            System.out.println("6. Trocar usuario");
+            System.out.println("7. Sair");
+            System.out.print("Opcao: ");
+            op = scanner.nextInt();
+            scanner.nextLine();
+            switch (op) {
+                case 1: listarEntreDatas(); break;
+                case 2: buscarPorFuncionario(); break;
+                case 3: buscarPorDescricao(); break;
+                case 4: visualizarEAvaliar(); break;
+                case 5: estatisticas(); break;
+                case 6: return;
+                case 7: System.exit(0);
+                default: System.out.println("Opcao invalida");
+            }
+        } while (true);
+    }
+
+    private void listarEntreDatas() {
+        System.out.print("Data inicio (yyyy-MM-dd): ");
+        Date ini = java.sql.Date.valueOf(scanner.nextLine());
+        System.out.print("Data fim    (yyyy-MM-dd): ");
+        Date fim = java.sql.Date.valueOf(scanner.nextLine());
+        for (Pedido p : sistema.listarPedidosEntreDatas(ini, fim)) {
+            System.out.println(p);
+        }
+    }
+
+    private void buscarPorFuncionario() {
+        System.out.print("Nome do funcionario: ");
+        String nome = scanner.nextLine();
+        for (Pedido p : sistema.buscarPorFuncionario(nome)) {
+            System.out.println(p);
+        }
+    }
+
+    private void buscarPorDescricao() {
+        System.out.print("Texto na descricao do item: ");
+        String txt = scanner.nextLine();
+        for (Pedido p : sistema.buscarPorDescricao(txt)) {
+            System.out.println(p);
+        }
+    }
+
+    private void visualizarEAvaliar() {
+        List<Pedido> abertos = new ArrayList<>();
+        for (Pedido p : sistema.getPedidos()) {
+            if (p.getStatus() == StatusPedido.ABERTO) {
+                abertos.add(p);
+            }
+        }
+        if (abertos.isEmpty()) {
+            System.out.println("Nao ha pedidos abertos");
             return;
         }
-
-        // Digitar o departamento (com base no funcionario)
-        Departamento departamento = funcionario.getDepartamento();
-
-        // Digitar dados do pedido
-        System.out.print("Digite a descricao do item: ");
-        String descricaoItem = scanner.nextLine();
-        System.out.print("Digite o valor unitario do item: ");
-        double valorUnitario = scanner.nextDouble();
-        System.out.print("Digite a quantidade: ");
-        int quantidade = scanner.nextInt();
-        scanner.nextLine();  // Limpar o buffer
-
-        // Calcular o total do item
-        double totalItem = valorUnitario * quantidade;
-
-        // Criar o pedido
-        Pedido pedido = new Pedido(funcionario, departamento, new java.util.Date(), descricaoItem, valorUnitario, quantidade, totalItem);
-
-        // Verificar se o pedido está dentro do limite do departamento
-        if (pedido.getTotal() <= departamento.getLimite()) {
-            sistema.adicionarPedido(pedido);
-            System.out.println("Pedido adicionado com sucesso!");
-        } else {
-            System.out.println("Valor do pedido excede o limite do departamento!");
+        for (int i = 0; i < abertos.size(); i++) {
+            System.out.printf("%d. %s%n", i+1, abertos.get(i));
         }
-    }
-
-    private void listarUsuarios() {
-        System.out.println("\nUsuarios cadastrados:");
-        for (Usuario usuario : sistema.getUsuarios()) {
-            System.out.println("ID: " + usuario.getId() + ", Nome: " + usuario.getNome());
-        }
-    }
-
-    private void listarPedidos() {
-        System.out.println("\nPedidos cadastrados:");
-        for (Pedido pedido : sistema.getPedidos()) {
-            System.out.println(pedido);
-        }
-    }
-    
-    private void FuncaoAdministrador(){
-        System.out.println("---MENU ADM---");
-        System.out.println("1. Avaliar pedidos.");
-        System.out.println("2. Listar pedidos por data.");
-        System.out.println("3. Buscar pedidos por funcionario.");
-        System.out.println("4. Buscar pedidos pela descrição.");
-        System.out.println("5. Sair");
-        System.out.print("Escolha uma opcao: ");
-        int valor = scanner.nextInt();
+        System.out.print("Escolha numero: ");
+        int idx = scanner.nextInt();
         scanner.nextLine();
+        if (idx < 1 || idx > abertos.size()) {
+            System.out.println("Pedido invalido");
+            return;
+        }
+        Pedido p = abertos.get(idx - 1);
+        System.out.println("Detalhes: " + p);
+        System.out.print("1-Aprovar  2-Reprovar  0-Cancelar: ");
+        int op = scanner.nextInt();
+        scanner.nextLine();
+        if (op == 1) {
+            p.setStatus(StatusPedido.APROVADO);
+            p.setDataConclusao(new Date());
+            System.out.println("Aprovado");
+        } else if (op == 2) {
+            p.setStatus(StatusPedido.REPROVADO);
+            p.setDataConclusao(new Date());
+            System.out.println("Reprovado");
+        }
+    }
 
-        switch (valor) {
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                break;
-            case 5:
-                System.out.println("saindo...");
-                break;
-            default:
-                System.out.println("Opcao Invalida!");
+    private void estatisticas() {
+        List<Pedido> todos = sistema.getPedidos();
+        long total = todos.size();
+        long apro = todos.stream().filter(p -> p.getStatus() == StatusPedido.APROVADO).count();
+        long repro = todos.stream().filter(p -> p.getStatus() == StatusPedido.REPROVADO).count();
+        System.out.printf("Total: %d  Aprovados: %d (%.1f%%)  Reprovados: %d (%.1f%%)%n",
+            total, apro, total>0?100.0*apro/total:0, repro, total>0?100.0*repro/total:0);
+
+        Date hoje = new Date();
+        long ms30 = 30L * 24 * 60 * 60 * 1000;
+        List<Pedido> ult30 = new ArrayList<>();
+        for (Pedido p : todos) {
+            if (hoje.getTime() - p.getDataPedido().getTime() <= ms30) {
+                ult30.add(p);
+            }
+        }
+        double media = ult30.stream().mapToDouble(Pedido::getTotal).average().orElse(0);
+        System.out.printf("Ultimos 30 dias: %d pedidos, valor medio R$ %.2f%n",
+            ult30.size(), media);
+
+        Pedido maior = todos.stream()
+            .filter(p -> p.getStatus() == StatusPedido.ABERTO)
+            .max((a,b) -> Double.compare(a.getTotal(), b.getTotal()))
+            .orElse(null);
+        if (maior != null) {
+            System.out.println("Maior pedido aberto: " + maior);
+        } else {
+            System.out.println("Nao ha pedidos abertos");
         }
     }
 }

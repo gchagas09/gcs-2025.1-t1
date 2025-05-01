@@ -1,19 +1,17 @@
 public enum Departamento {
-    RECURSOS_HUMANOS(1000),
-    FINANCEIRO(1000),
-    MARKETING(1000),
-    VENDAS(1000),
-    DIRETORIA(1000),
-    TI(1000),
-    OPERACOES(1000);
+    FINANCEIRO(5000),
+    RH(3000),
+    ENGENHARIA(10000),
+    MANUTENCAO(7000),
+    TI(8000);
 
-    private double limitePedido;
+    private double limite;
 
-    Departamento(double limitePedido) {
-        this.limitePedido = limitePedido;
+    Departamento(double limite) {
+        this.limite = limite;
     }
 
     public double getLimite() {
-        return this.limitePedido;
+        return limite;
     }
 }
